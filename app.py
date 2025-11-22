@@ -47,14 +47,22 @@ puntate = {
 # 3. RISULTATO COME PULSANTI
 # ---------------------------
 st.header("🎴 Seleziona il risultato dello spin")
-risultato_spin = None
+
+# Inizializza il risultato nello session_state
+if "risultato_spin" not in st.session_state:
+    st.session_state.risultato_spin = None
+
 col_buttons = st.columns(8)
 gioco_nomi = ["1", "2", "5", "10", "CoinFlip", "Pachinko", "CashHunt", "CrazyTime"]
 emoji = ["🎯","🔵","💎","🟡","🪙","🎡","🎯","🎉"]
 
 for i, col in enumerate(col_buttons):
     if col.button(f"{emoji[i]} {gioco_nomi[i]}"):
-        risultato_spin = gioco_nomi[i]
+        st.session_state.risultato_spin = gioco_nomi[i]
+
+# Mostra il risultato selezionato
+if st.session_state.risultato_spin:
+    st.info(f"✅ Risultato selezionato: {st.session_state.risultato_spin}")
 
 # ---------------------------
 # 4. MOLTIPLICATORE
@@ -70,6 +78,9 @@ coef = {"1":1, "2":2, "5":5, "10":10, "CoinFlip":1, "Pachinko":1, "CashHunt":1, 
 # 6. AGGIUNGI GIRO
 # ---------------------------
 if st.button("Aggiungi giro 🎰"):
+    # Prendi il risultato dalla session_state
+    risultato_spin = st.session_state.risultato_spin
+
     if risultato_spin is None:
         st.warning("Seleziona un risultato cliccando su una carta!")
     else:
