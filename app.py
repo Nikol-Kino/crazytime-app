@@ -26,20 +26,20 @@ st.header("🎯 Imposta le tue puntate")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    puntata_1 = st.number_input("Puntata su 1", min_value=0.0, step=0.5)
-    puntata_coin = st.number_input("Puntata CoinFlip", min_value=0.0, step=0.5)
+    puntata_1 = st.number_input("Puntata su 1", min_value=0.0, step=0.1)
+    puntata_coin = st.number_input("Puntata CoinFlip", min_value=0.0, step=0.1)
 
 with col2:
-    puntata_2 = st.number_input("Puntata su 2", min_value=0.0, step=0.5)
-    puntata_pachinko = st.number_input("Puntata Pachinko", min_value=0.0, step=0.5)
+    puntata_2 = st.number_input("Puntata su 2", min_value=0.0, step=0.1)
+    puntata_pachinko = st.number_input("Puntata Pachinko", min_value=0.0, step=0.1)
 
 with col3:
-    puntata_5 = st.number_input("Puntata su 5", min_value=0.0, step=0.5)
-    puntata_cashhunt = st.number_input("Puntata Cash Hunt", min_value=0.0, step=0.5)
+    puntata_5 = st.number_input("Puntata su 5", min_value=0.0, step=0.1)
+    puntata_cashhunt = st.number_input("Puntata Cash Hunt", min_value=0.0, step=0.1)
 
 with col4:
-    puntata_10 = st.number_input("Puntata su 10", min_value=0.0, step=0.5)
-    puntata_crazy = st.number_input("Puntata CrazyTime", min_value=0.0, step=0.5)
+    puntata_10 = st.number_input("Puntata su 10", min_value=0.0, step=0.1)
+    puntata_crazy = st.number_input("Puntata CrazyTime", min_value=0.0, step=0.1)
 
 puntate = {
     "1": puntata_1,
@@ -75,10 +75,10 @@ coef = {
     "2": 2,
     "5": 5,
     "10": 10,
-    "CoinFlip": 2,     # default, ma può ricevere moltiplicatori
-    "Pachinko": 10,    # valori medi standard
-    "CashHunt": 25,
-    "CrazyTime": 50
+    "CoinFlip": 1,     # default, ma può ricevere moltiplicatori
+    "Pachinko": 1,    # valori medi standard
+    "CashHunt": 1,
+    "CrazyTime": 1
 }
 
 # ---------------------------
