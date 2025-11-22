@@ -1,12 +1,10 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import time
-import random
 
-st.set_page_config(layout="wide", page_title="Crazy Time Simulator Animato")
+st.set_page_config(layout="wide", page_title="Crazy Time Simulator PRO")
 
-st.title("🎡 Crazy Time Simulator – Animazione Ruota PRO")
+st.title("🎡 Crazy Time Simulator – Versione Pulsanti & Controllo Saldo")
 
 # ---------------------------
 # 1. BUDGET / RICARICA
@@ -25,7 +23,6 @@ st.sidebar.write(f"**Saldo attuale:** {st.session_state.saldo:.2f} €")
 # 2. PANNELLO PUNTATE
 # ---------------------------
 st.header("🎯 Imposta le tue puntate")
-
 col1, col2, col3, col4 = st.columns(4)
 with col1:
     puntata_1 = st.number_input("Puntata su 1", min_value=0.0, step=0.1)
@@ -47,55 +44,60 @@ puntate = {
 }
 
 # ---------------------------
-# 3. INPUT GIRO / MOLTIPLICATORE
+# 3. RISULTATO COME PULSANTI
 # ---------------------------
-st.header("🎡 Inserisci l’esito dello spin")
-colA, colB = st.columns(2)
-with colA:
-    risultato_spin = st.selectbox("Risultato uscito:", list(puntate.keys()))
-with colB:
-    moltiplicatore = st.number_input("Moltiplicatore (se presente)", min_value=1, step=1)
+st.header("🎴 Seleziona il risultato dello spin")
+risultato_spin = None
+col_buttons = st.columns(8)
+gioco_nomi = ["1", "2", "5", "10", "CoinFlip", "Pachinko", "CashHunt", "CrazyTime"]
+emoji = ["🎯","🔵","💎","🟡","🪙","🎡","🎯","🎉"]
+
+for i, col in enumerate(col_buttons):
+    if col.button(f"{emoji[i]} {gioco_nomi[i]}"):
+        risultato_spin = gioco_nomi[i]
 
 # ---------------------------
-# 4. COEFFICIENTI
+# 4. MOLTIPLICATORE
+# ---------------------------
+moltiplicatore = st.number_input("Moltiplicatore (se presente)", min_value=1, step=1)
+
+# ---------------------------
+# 5. COEFFICIENTI BASE
 # ---------------------------
 coef = {"1":1, "2":2, "5":5, "10":10, "CoinFlip":1, "Pachinko":1, "CashHunt":1, "CrazyTime":1}
 
 # ---------------------------
-# 5. ANIMAZIONE RUOTA + CALCOLO
+# 6. AGGIUNGI GIRO
 # ---------------------------
 if st.button("Aggiungi giro 🎰"):
-    totale_puntato = sum(puntate.values())
-    st.session_state.saldo -= totale_puntato
-    puntata_vincente = puntate[risultato_spin]
-    vincita = puntata_vincente + (puntata_vincente * coef[risultato_spin] * moltiplicatore) if puntata_vincente > 0 else 0
-    st.session_state.saldo += vincita
+    if risultato_spin is None:
+        st.warning("Seleziona un risultato cliccando su una carta!")
+    else:
+        totale_puntato = sum(puntate.values())
+        if totale_puntato > st.session_state.saldo:
+            st.error("❌ Non hai abbastanza soldi sul conto per giocare!")
+        else:
+            st.session_state.saldo -= totale_puntato
+            puntata_vincente = puntate[risultato_spin]
+            vincita = puntata_vincente + (puntata_vincente * coef[risultato_spin] * moltiplicatore) if puntata_vincente>0 else 0
+            st.session_state.saldo += vincita
 
-    # Animazione ruota
-    placeholder = st.empty()
-    opzioni_ruota = list(puntate.keys())*3  # ripetiamo per effetto rotazione
-    random.shuffle(opzioni_ruota)
-    for val in opzioni_ruota[:15]:
-        placeholder.markdown(f"**🎡 Ruota: {val}**")
-        time.sleep(0.1)
-    placeholder.markdown(f"**🎉 Numero estratto: {risultato_spin}**")
-    st.success(f"Vincita: {vincita:.2f} €")
-    st.sidebar.write(f"**Saldo aggiornato:** {st.session_state.saldo:.2f} €")
+            st.success(f"🎉 Spin giocato! Vincita: {vincita:.2f} €")
+            st.sidebar.write(f"**Saldo aggiornato:** {st.session_state.saldo:.2f} €")
 
-    # Storico
-    if "storico" not in st.session_state:
-        st.session_state.storico = []
-    st.session_state.storico.append({
-        "Spin": len(st.session_state.storico)+1,
-        "Risultato": risultato_spin,
-        "Moltiplicatore": moltiplicatore,
-        "Totale Puntato": totale_puntato,
-        "Vincita": vincita,
-        "Saldo Dopo Giro": st.session_state.saldo
-    })
+            if "storico" not in st.session_state:
+                st.session_state.storico = []
+            st.session_state.storico.append({
+                "Spin": len(st.session_state.storico)+1,
+                "Risultato": risultato_spin,
+                "Moltiplicatore": moltiplicatore,
+                "Totale Puntato": totale_puntato,
+                "Vincita": vincita,
+                "Saldo Dopo Giro": st.session_state.saldo
+            })
 
 # ---------------------------
-# 6. MOSTRA STORICO + GRAFICI + ROI + Percentuali + Alert
+# 7. MOSTRA STORICO + GRAFICI
 # ---------------------------
 if "storico" in st.session_state and len(st.session_state.storico)>0:
     df = pd.DataFrame(st.session_state.storico)
@@ -145,8 +147,8 @@ if "storico" in st.session_state and len(st.session_state.storico)>0:
 
     # Alerts automatici
     st.subheader("🚨 Alerts automatici")
-    if st.session_state.saldo <= -50:
-        st.error("⚠️ Stai perdendo più di €50!")
+    if st.session_state.saldo <= 0:
+        st.error("⚠️ Il tuo saldo è finito! Ricarica per continuare.")
     elif st.session_state.saldo >= 50:
         st.success("🟢 Hai superato i €50 di profitto!")
 else:
